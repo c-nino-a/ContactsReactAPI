@@ -19,7 +19,7 @@ const ContactsList = () => {
             <List divided size='massive'>
                 {contacts.map(contact=>{
                     return (
-                        <List.Item>
+                        <List.Item key = {contact.id}>
                             <Link to={`/contact/${contact.id}`}>
                                 <List.Header as='a'>{contact.firstname} {contact.lastname}</List.Header>
                             </Link>
