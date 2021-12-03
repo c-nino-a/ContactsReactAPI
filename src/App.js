@@ -8,6 +8,7 @@ function App() {
       <Routes>
         <Route path='/' element={<ContactsList/>}/>
         <Route path='/contact/:id' element={<ContactForm/>}/>
+        <Route path='/new' element={<ContactForm/>}/>
       </Routes>
     </Router>
   );
