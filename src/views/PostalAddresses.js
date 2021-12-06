@@ -1,29 +1,14 @@
+import { useContext } from "react"
+import { PersonDispatchContext, PersonStateContext } from "../provider/personProvider";
+
 const { Table, Button, Icon, Input } = require("semantic-ui-react")
 
 const PostalAdresses = ({ props }) => {
 
-    const { person, setPerson } = props
+    const state = useContext( PersonStateContext)
+    const dispatch = useContext( PersonDispatchContext)
 
-    const addPostalAddress = () => {
-        person.postaladdresses.push({street:"",zipcode:"",city:""})
-        setPerson({...person});
-    }
-
-    const handlePostalAddressField = (field, idx) => {
-
-        const {name, value} = field;
-
-        person.postaladdresses[idx][name]=value;
-
-        setPerson({...person});
-    }
-
-    const removePostalAddresses = (idx) => {
-        person.postaladdresses.splice(idx,1);
-        setPerson({...person});
-    }
-
-    const { postaladdresses } = person;
+    const { postaladdresses } = state;
 
     return (
         <>
@@ -31,7 +16,7 @@ const PostalAdresses = ({ props }) => {
                 <Table.Header>
                     <Table.Row>
                         <Table.HeaderCell>
-                            <Button type="button" icon onClick={addPostalAddress}>
+                        <Button type="button" icon onClick={()=>dispatch({type:'addPostalAddress'})}>
                                 <Icon name="plus"/>
                             </Button>
                         </Table.HeaderCell>
@@ -45,8 +30,8 @@ const PostalAdresses = ({ props }) => {
                         return (
                             <Table.Row key={idx}>
                                 <Table.Cell>
-                                    <Button type="button" icon onClick={()=>removePostalAddresses(idx)}>
-                                        <Icon name="minus"/>
+                                <Button type="button" icon onClick={()=>dispatch({type:'removePostalAddresses', payload:{idx}})}>
+                                        <Icon name="close"/>
                                     </Button>
                                 </Table.Cell>
                                 <Table.Cell>
@@ -54,21 +39,21 @@ const PostalAdresses = ({ props }) => {
                                     name="street"
                                     placeholder="e.g. Gamboa"
                                     value={pa.street}
-                                    onChange={(e,field)=>{handlePostalAddressField(field,idx)}}/>
+                                    onChange={(e,field)=>{dispatch({type:'handlePostalAddressField', payload:{field,idx}})}}/>
                                 </Table.Cell>
                                 <Table.Cell>
                                     <Input
                                         name="city"
                                         placeholder="e.g. Makati"
                                         value={pa.city}
-                                        onChange={(e,field)=>{handlePostalAddressField(field,idx)}}/>
+                                        onChange={(e,field)=>{dispatch({type:'handlePostalAddressField', payload:{field,idx}})}}/>
                                 </Table.Cell>
                                 <Table.Cell>
                                     <Input
                                         name="zipcode"
                                         placeholder="e.g. 199"
                                         value={pa.zipcode}
-                                        onChange={(e,field)=>{handlePostalAddressField(field,idx)}}/>
+                                        onChange={(e,field)=>{dispatch({type:'handlePostalAddressField', payload:{field,idx}})}}/>
                                 </Table.Cell>
                             </Table.Row>
                         )

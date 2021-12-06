@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Form, Button, Message, Icon} from "semantic-ui-react";
 import {Link} from "react-router-dom";
 import EmailAddresses from "./EmailAddresses";
-import PostalAddresses from "./PostalAddresses";
+import PostalAddresses from "./PostalAddresses.js";
+
+import { PersonDispatchContext, PersonStateContext } from "../provider/PersonProvider";
 
 const ContactForm = (props) => {
     const [showSaved,setShowSaved] = useState(false);
@@ -14,7 +16,8 @@ const ContactForm = (props) => {
         emailaddresses:[],
         postaladdresses:[]
     };
-    const [person, setPerson] = useState(emptyPerson);
+    const state = useContext( PersonStateContext)
+    const dispatch = useContext( PersonDispatchContext)
 
     const { id } = useParams();
 
@@ -23,7 +26,7 @@ const ContactForm = (props) => {
         (async ()=>{
 
             if(!id){ 
-                return setPerson(emptyPerson);
+                return dispatch({type:'empty'});
             }
 
             const response = await fetch("/contact/"+id,{
@@ -34,7 +37,7 @@ const ContactForm = (props) => {
 
             const payload = await response.json();
 
-            setPerson(payload);
+            dispatch({type:'load', payload});
         })()
 
     },[])
@@ -45,7 +48,7 @@ const ContactForm = (props) => {
         const packet = {
             method: "POST",
             headers: { "contentType":"application/json"},
-            body: JSON.stringify(person)
+            body: JSON.stringify(state)
         }
 
         await fetch('/contact',packet)
@@ -55,16 +58,9 @@ const ContactForm = (props) => {
         setTimeout(()=>{setShowSaved(false)}, 3000);
     }
 
-    const handleFieldChange = field => {
-        const {name, value} = field
-
-        person[name] = value;
-
-        setPerson({...person})
-    }
 
 
-    const {firstname, lastname} = person;
+    const {firstname, lastname} = state;
 
     return (
         <div>
@@ -73,6 +69,8 @@ const ContactForm = (props) => {
                     <Icon name="left arrow"/>
                 </Button>
             </Link>
+            {/* <TitleLabel/> */}
+
             <Form onSubmit={saveContact}>
 
                 <Form.Field>
@@ -80,7 +78,7 @@ const ContactForm = (props) => {
                         name="firstname"
                         label="First Name"
                         value={firstname}
-                        onChange={(e,field)=>handleFieldChange(field)}
+                        onChange={(e,payload)=>dispatch({type:'handleFieldChange',payload})}
                     />
                 </Form.Field>
 
@@ -89,15 +87,15 @@ const ContactForm = (props) => {
                         name="lastname"
                         label="Last Name"
                         value={lastname}
-                        onChange={(e,field)=>handleFieldChange(field)} 
+                        onChange={(e,payload)=>dispatch({type:'handleFieldChange',payload})} 
                     />
                 </Form.Field>
-                <EmailAddresses props={{person, setPerson}}/>
-                <PostalAddresses props={{person, setPerson}}/>
+                <EmailAddresses props={{state, setPerson: dispatch}}/>
+                <PostalAddresses props={{state, setPerson: dispatch}}/>
 
                 <Button>Save</Button>
             </Form>
-            {showSaved?<Message>Saved</Message>:null}
+            {showSaved?<Message color="green">Saved</Message>:null}
         </div>
     )
 }

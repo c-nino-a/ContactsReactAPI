@@ -1,35 +1,20 @@
+import { useContext } from "react";
 import { Button, Table, Icon, Input} from "semantic-ui-react";
+import { PersonDispatchContext, PersonStateContext } from "../provider/personProvider";
 
-const EmailAddresses = ({props}) => {
+const EmailAddresses = () => {
 
-    const { person, setPerson } = props
+    const state = useContext( PersonStateContext)
+    const dispatch = useContext( PersonDispatchContext)
 
-    const handleEmailAddressChange = ({field, idx}) => {
-        const {value} = field;
+    const {emailaddresses} = state;
 
-        person.emailaddresses[idx] = value;
-
-        setPerson({...person});
-    }
-
-    const addEmailAddressField = () => {
-        person.emailaddresses.push("");
-
-        setPerson({...person});
-    }
-
-    const removeEmailAddressField = (idx) => {
-        person.emailaddresses.splice(idx, 1)
-
-        setPerson({...person});
-    }
-    const {emailaddresses} = person;
     return (
     <Table>
         <Table.Header>
             <Table.Row>
                 <Table.HeaderCell>
-                    <Button icon type="button" onClick={addEmailAddressField}>
+                <Button icon type="button" onClick={()=>dispatch({type:'addEmailAddressField'})}>
                         <Icon name='plus'></Icon>
                     </Button>
                 </Table.HeaderCell>
@@ -40,14 +25,14 @@ const EmailAddresses = ({props}) => {
                 return(
                     <Table.Row key={idx}>
                         <Table.Cell>
-                            <Button icon type="button" onClick={()=>{removeEmailAddressField(idx)}}>
-                                <Icon name='minus'></Icon>
+                        <Button icon type="button" onClick={()=>dispatch({type:'removeEmailAddressField',payload:{idx}})}>
+                                <Icon name='close'></Icon>
                             </Button>
                             <Input
                                 name = 'emailaddresses'
                                 placeholder = 'example@example.com'
                                 value = {item}
-                                onChange = {(e,field) => handleEmailAddressChange({field,idx})}
+                                onChange = {(e,field) => dispatch({type:'handleEmailAddressChange',payload:{field,idx}})}
                             />
                         </Table.Cell>
                     </Table.Row>
